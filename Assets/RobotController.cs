@@ -7,11 +7,8 @@ public class RobotController : MonoBehaviour {
     enum Actions {Attack, Break, Block, Dash}
 
     public KeyCode backKey, forwardKey;
-    public float walkSpeed, dashSpeed; 
-    public float punchSpeed, punchStrength;
-    public float breakSpeed, breakStrength;
-    public float reach;
-    public float shieldPower, maxHealth, maxPower;
+    public RobotData stats;
+    float maxPower;
     public bool isInvulnerable, isBlocking;
     [HideInInspector]
     public float currHealth, currPower;
@@ -32,13 +29,14 @@ public class RobotController : MonoBehaviour {
 	void Start () {
         hitBox = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        currHealth = maxHealth;
+        currHealth = stats.health;
+        maxPower = 100;
         currPower = maxPower;
 	}
 
 	// Update is called once per frame
 	void Update () {
-        healthBar.value = currHealth / maxHealth;
+        healthBar.value = currHealth / stats.health;
         powerBar.value = currPower / maxPower;
 
         anim.SetBool("BlockPressed", false);
@@ -98,13 +96,13 @@ public class RobotController : MonoBehaviour {
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") && !opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
-                opp.currHealth -= punchStrength;
+                opp.currHealth -= stats.punchStrength;
                 StartCoroutine("TimeHitch");
             }
             else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") && !opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
-                opp.currHealth -= breakStrength;
+                opp.currHealth -= stats.breakStrength;
                 StartCoroutine("TimeHitch");
             }
             else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") && opp.isBlocking && !opp.isInvulnerable)
@@ -115,7 +113,7 @@ public class RobotController : MonoBehaviour {
             else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") && opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
-                opp.currHealth -= breakStrength;
+                opp.currHealth -= stats.breakStrength;
                 StartCoroutine("TimeHitch");
             }
         }
@@ -170,22 +168,22 @@ public class RobotController : MonoBehaviour {
 
     void Move()
     {
-        hitBox.velocity = new Vector3(walkSpeed, 0);
+        hitBox.velocity = new Vector3(stats.walkSpeed, 0);
     }
 
     void Dash()
     {
-        hitBox.velocity = new Vector3(dashSpeed, 0);
+        hitBox.velocity = new Vector3(stats.dashSpeed, 0);
     }
 
     void MoveBack()
     {
-        hitBox.velocity = new Vector3(-0.5f * walkSpeed, 0);
+        hitBox.velocity = new Vector3(-0.5f * stats.walkSpeed, 0);
     }
 
     void DashBack()
     {
-        hitBox.velocity = new Vector3(-1.5f * dashSpeed, 0);
+        hitBox.velocity = new Vector3(-1.5f * stats.dashSpeed, 0);
     }
 
     void Stop()
@@ -195,7 +193,7 @@ public class RobotController : MonoBehaviour {
 
     void KnockBack()
     {
-        hitBox.velocity = new Vector3(-0.7f * walkSpeed, 0);
+        hitBox.velocity = new Vector3(-0.7f * stats.walkSpeed, 0);
     }
 
     void DrainPower(Actions act)
@@ -203,16 +201,16 @@ public class RobotController : MonoBehaviour {
         switch (act)
         {
             case Actions.Attack:
-                currPower -= Mathf.Sqrt(punchSpeed * punchSpeed + (punchStrength / RobotStats.AveragePunchStrength) * (punchStrength / RobotStats.AveragePunchStrength) + reach * reach) * RobotStats.PunchDrain / Mathf.Sqrt(3);
+                currPower -= Mathf.Sqrt(stats.punchSpeed * stats.punchSpeed + (stats.punchStrength / RobotStats.AveragePunchStrength) * (stats.punchStrength / RobotStats.AveragePunchStrength) + stats.reach * stats.reach) * RobotStats.PunchDrain / Mathf.Sqrt(3);
                 break;
             case Actions.Break:
-                currPower -= Mathf.Sqrt(breakSpeed * breakSpeed + (breakStrength / RobotStats.AverageBreakStrength) * (breakStrength / RobotStats.AverageBreakStrength) + reach * reach) * RobotStats.BreakDrain / Mathf.Sqrt(3);
+                currPower -= Mathf.Sqrt(stats.breakSpeed * stats.breakSpeed + (stats.breakStrength / RobotStats.AverageBreakStrength) * (stats.breakStrength / RobotStats.AverageBreakStrength) + stats.reach * stats.reach) * RobotStats.BreakDrain / Mathf.Sqrt(3);
                 break;
             case Actions.Block:
-                currPower -= shieldPower * RobotStats.BlockDrain;
+                currPower -= stats.shieldPower * RobotStats.BlockDrain;
                 break;
             case Actions.Dash:
-                currPower -= Mathf.Sqrt((dashSpeed / RobotStats.AverageDashSpeed) * (dashSpeed / RobotStats.AverageDashSpeed) + (walkSpeed / RobotStats.AverageWalkSpeed) * (walkSpeed / RobotStats.AverageWalkSpeed)) * RobotStats.DashDrain / Mathf.Sqrt(2);
+                currPower -= Mathf.Sqrt((stats.dashSpeed / RobotStats.AverageDashSpeed) * (stats.dashSpeed / RobotStats.AverageDashSpeed) + (stats.walkSpeed / RobotStats.AverageWalkSpeed) * (stats.walkSpeed / RobotStats.AverageWalkSpeed)) * RobotStats.DashDrain / Mathf.Sqrt(2);
                 break;
         }
     }
