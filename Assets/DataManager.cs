@@ -8,15 +8,23 @@ public class DataManager : MonoBehaviour {
 
     public float mutationRate = 0.2f;
 
-    public RobotData player1Parent1, player1Parent2, player2Parent1, player2Parent2;
+    public RobotData player1Parent, player2Parent;
 
 	// Use this for initialization
-	void Start () {
-        Object.DontDestroyOnLoad(this);
-	}
+    public void Awake()
+    {
+        DontDestroyOnLoad(this);
+
+        if (FindObjectsOfType(GetType()).Length > 1)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public void InitData()
     {
+        player1Data.Clear();
+        player2Data.Clear();
         for (int i = 0; i < 7; i++)
         {
             player1Data.Add(new RobotData());
@@ -32,8 +40,8 @@ public class DataManager : MonoBehaviour {
             player1Data[i].breakSpeed = genNormalRandom(1, 0.15f);
             player1Data[i].reach = genNormalRandom(1, 0.15f);
 
-            player2Data[i].walkSpeed = genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev);
-            player2Data[i].dashSpeed = genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev);
+            player2Data[i].walkSpeed = genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev) * -1;
+            player2Data[i].dashSpeed = genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev) * -1;
             player2Data[i].health = genNormalRandom(100, 10);
             player2Data[i].shieldPower = genNormalRandom(1, 0.25f);
             player2Data[i].punchStrength = genNormalRandom(RobotStats.AveragePunchStrength, RobotStats.PunchStrengthDev);
@@ -48,25 +56,25 @@ public class DataManager : MonoBehaviour {
     {
         for (int i = 0; i < 7; i++)
         {
-            player1Data[i].walkSpeed = randomSelect(player1Parent1.walkSpeed, player1Parent2.walkSpeed, genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev));
-            player1Data[i].dashSpeed = randomSelect(player1Parent1.dashSpeed, player1Parent2.dashSpeed, genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev));
-            player1Data[i].health = randomSelect(player1Parent1.health, player1Parent2.health, genNormalRandom(100, 10));
-            player1Data[i].shieldPower = randomSelect(player1Parent1.shieldPower, player1Parent2.shieldPower, genNormalRandom(1, 0.25f));
-            player1Data[i].punchStrength = randomSelect(player1Parent1.punchStrength, player1Parent2.punchStrength, genNormalRandom(RobotStats.AveragePunchStrength, RobotStats.PunchStrengthDev));
-            player1Data[i].punchSpeed = randomSelect(player1Parent1.punchSpeed, player1Parent2.punchSpeed, genNormalRandom(1, 0.15f));
-            player1Data[i].breakStrength = randomSelect(player1Parent1.breakStrength, player1Parent2.breakStrength, genNormalRandom(RobotStats.AverageBreakStrength, RobotStats.BreakStrengthDev));
-            player1Data[i].breakSpeed = randomSelect(player1Parent1.breakSpeed, player1Parent2.breakSpeed, genNormalRandom(1, 0.15f));
-            player1Data[i].reach = randomSelect(player1Parent1.reach, player1Parent2.reach, genNormalRandom(1, 0.15f));
+            player1Data[i].walkSpeed = randomSelect(player1Parent.walkSpeed, player1Data[i].walkSpeed, genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev));
+            player1Data[i].dashSpeed = randomSelect(player1Parent.dashSpeed, player1Data[i].dashSpeed, genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev));
+            player1Data[i].health = randomSelect(player1Parent.health, player1Data[i].health, genNormalRandom(100, 20));
+            player1Data[i].shieldPower = randomSelect(player1Parent.shieldPower, player1Data[i].shieldPower, genNormalRandom(1, 0.25f));
+            player1Data[i].punchStrength = randomSelect(player1Parent.punchStrength, player1Data[i].punchStrength, genNormalRandom(RobotStats.AveragePunchStrength, RobotStats.PunchStrengthDev));
+            player1Data[i].punchSpeed = randomSelect(player1Parent.punchSpeed, player1Data[i].punchSpeed, genNormalRandom(1, 0.2f));
+            player1Data[i].breakStrength = randomSelect(player1Parent.breakStrength, player1Data[i].breakStrength, genNormalRandom(RobotStats.AverageBreakStrength, RobotStats.BreakStrengthDev));
+            player1Data[i].breakSpeed = randomSelect(player1Parent.breakSpeed, player1Data[i].breakSpeed, genNormalRandom(1, 0.2f));
+            player1Data[i].reach = randomSelect(player1Parent.reach, player1Data[i].reach, genNormalRandom(1, 0.4f));
 
-            player2Data[i].walkSpeed = randomSelect(player2Parent1.walkSpeed, player2Parent2.walkSpeed, genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev));
-            player2Data[i].dashSpeed = randomSelect(player2Parent1.dashSpeed, player2Parent2.dashSpeed, genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev));
-            player2Data[i].health = randomSelect(player2Parent1.health, player2Parent2.health, genNormalRandom(100, 10));
-            player2Data[i].shieldPower = randomSelect(player2Parent1.shieldPower, player2Parent2.shieldPower, genNormalRandom(1, 0.25f));
-            player2Data[i].punchStrength = randomSelect(player2Parent1.punchStrength, player2Parent2.punchStrength, genNormalRandom(RobotStats.AveragePunchStrength, RobotStats.PunchStrengthDev));
-            player2Data[i].punchSpeed = randomSelect(player2Parent1.punchSpeed, player2Parent2.punchSpeed, genNormalRandom(1, 0.15f));
-            player2Data[i].breakStrength = randomSelect(player2Parent1.breakStrength, player2Parent2.breakStrength, genNormalRandom(RobotStats.AverageBreakStrength, RobotStats.BreakStrengthDev));
-            player2Data[i].breakSpeed = randomSelect(player2Parent1.breakSpeed, player2Parent2.breakSpeed, genNormalRandom(1, 0.15f));
-            player2Data[i].reach = randomSelect(player2Parent1.reach, player2Parent2.reach, genNormalRandom(1, 0.15f));
+            player2Data[i].walkSpeed = randomSelect(player2Parent.walkSpeed, player2Data[i].walkSpeed, genNormalRandom(RobotStats.AverageWalkSpeed, RobotStats.WalkSpeedDev) * -1);
+            player2Data[i].dashSpeed = randomSelect(player2Parent.dashSpeed, player2Data[i].dashSpeed, genNormalRandom(RobotStats.AverageDashSpeed, RobotStats.DashSpeedDev) * -1);
+            player2Data[i].health = randomSelect(player2Parent.health, player2Data[i].health, genNormalRandom(100, 20));
+            player2Data[i].shieldPower = randomSelect(player2Parent.shieldPower, player2Data[i].shieldPower, genNormalRandom(1, 0.25f));
+            player2Data[i].punchStrength = randomSelect(player2Parent.punchStrength, player2Data[i].punchStrength, genNormalRandom(RobotStats.AveragePunchStrength, RobotStats.PunchStrengthDev));
+            player2Data[i].punchSpeed = randomSelect(player2Parent.punchSpeed, player2Data[i].punchSpeed, genNormalRandom(1, 0.2f));
+            player2Data[i].breakStrength = randomSelect(player2Parent.breakStrength, player2Data[i].breakStrength, genNormalRandom(RobotStats.AverageBreakStrength, RobotStats.BreakStrengthDev));
+            player2Data[i].breakSpeed = randomSelect(player2Parent.breakSpeed, player2Data[i].breakSpeed, genNormalRandom(1, 0.2f));
+            player2Data[i].reach = randomSelect(player2Parent.reach, player2Data[i].reach, genNormalRandom(1, 0.4f));
         }
     }
 

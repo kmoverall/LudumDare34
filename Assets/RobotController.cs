@@ -10,7 +10,7 @@ public class RobotController : MonoBehaviour {
     public RobotData stats;
     float maxPower;
     public bool isInvulnerable, isBlocking;
-    [HideInInspector]
+    //[HideInInspector]
     public float currHealth, currPower;
 
     public float doubleTapWindow = 0.15f;
@@ -23,7 +23,11 @@ public class RobotController : MonoBehaviour {
     bool breakerB = false;
     bool breakerF = false;
     Rigidbody2D hitBox;
-    Animator anim;
+    public BoxCollider2D punchBox, breakBox;
+    public ParticleSystem punchPart, breakPart, dashPart, hitPart, blockPart;
+    public Animator anim;
+
+    Vector3 velocity;
 
 	// Use this for initialization
 	void Start () {
@@ -32,10 +36,14 @@ public class RobotController : MonoBehaviour {
         currHealth = stats.health;
         maxPower = 100;
         currPower = maxPower;
+        punchBox.transform.localScale = new Vector3(1, stats.reach, 1);
+        breakBox.transform.localScale = new Vector3(1, stats.reach, 1);
 	}
 
 	// Update is called once per frame
 	void Update () {
+        velocity = hitBox.velocity;
+
         healthBar.value = currHealth / stats.health;
         powerBar.value = currPower / maxPower;
 
@@ -87,30 +95,35 @@ public class RobotController : MonoBehaviour {
                 StartCoroutine("ForwardDashTimer");
             }
         }
+
+        if (currHealth <= 0 || currPower <= 0)
+        {
+            anim.SetTrigger("Dead");
+        }
 	}
 
     void OnTriggerEnter2D(Collider2D other)
     {
         RobotController opp = other.GetComponent<RobotController>();
         if (!other.isTrigger) {
-            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") && !opp.isBlocking && !opp.isInvulnerable)
+            if ((anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") || anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking 1")) && !opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
                 opp.currHealth -= stats.punchStrength;
                 StartCoroutine("TimeHitch");
             }
-            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") && !opp.isBlocking && !opp.isInvulnerable)
+            else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") || anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking 1")) && !opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
                 opp.currHealth -= stats.breakStrength;
                 StartCoroutine("TimeHitch");
             }
-            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") && opp.isBlocking && !opp.isInvulnerable)
+            else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking") || anim.GetCurrentAnimatorStateInfo(0).IsName("Attacking 1")) && opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Block");
                 StartCoroutine("TimeHitch");
             }
-            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") && opp.isBlocking && !opp.isInvulnerable)
+            else if ((anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking") || anim.GetCurrentAnimatorStateInfo(0).IsName("Breaking 1")) && opp.isBlocking && !opp.isInvulnerable)
             {
                 opp.anim.SetTrigger("Hit");
                 opp.currHealth -= stats.breakStrength;
@@ -186,7 +199,7 @@ public class RobotController : MonoBehaviour {
         hitBox.velocity = new Vector3(-1.5f * stats.dashSpeed, 0);
     }
 
-    void Stop()
+    public void Stop()
     {
         hitBox.velocity = Vector3.zero;
     }
@@ -194,6 +207,52 @@ public class RobotController : MonoBehaviour {
     void KnockBack()
     {
         hitBox.velocity = new Vector3(-0.7f * stats.walkSpeed, 0);
+    }
+
+    void ResetSpeed()
+    {
+        anim.speed = 1;
+    }
+
+    void BreakSpeed()
+    {
+        anim.speed = stats.breakSpeed;
+    }
+    
+    void PunchSpeed()
+    {
+        anim.speed = stats.punchSpeed;
+    }
+
+    void PlayPunchSpark()
+    {
+        punchPart.Play();
+    }
+
+    void PlayBreakSpark()
+    {
+        breakPart.Play();
+    }
+
+    void PlayDashSpark()
+    {
+        dashPart.Play();
+    }
+
+    void PlayHitSpark()
+    {
+        hitPart.Play();
+    }
+
+    void PlayBlockPart()
+    {
+        blockPart.Play();
+    }
+
+    void StopParticles()
+    {
+        punchPart.Stop();
+        breakPart.Stop();
     }
 
     void DrainPower(Actions act)
