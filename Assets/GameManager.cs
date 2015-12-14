@@ -43,6 +43,11 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         if (data == null)
         {
             data = GameObject.FindObjectOfType<DataManager>().GetComponent<DataManager>();
@@ -124,7 +129,7 @@ public class GameManager : MonoBehaviour {
                 StartCoroutine("EndRound");
             }
 
-            ui.UpdateGameText(round, p1Wins, p2Wins, p1Ready, p2Ready, ready, winner, generation);
+            ui.UpdateGameText(round, p1Wins, p2Wins, p1Ready, p2Ready, ready, winner, generation, player1.stats, player2.stats);
         }
 
         //Generate New Sprite
